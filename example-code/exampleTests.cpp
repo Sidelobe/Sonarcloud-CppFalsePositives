@@ -12,6 +12,13 @@ bool runTests()
     if (exampleFunction1() > N) {
         return true;
     }
+    if (exampleFunction2(NULL) == false) {
+        return true;
+    }
+    if (MyCStyleEnum_COUNT == 2) {
+        return true;
+    }
+        
     
     return false;
 }
