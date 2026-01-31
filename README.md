@@ -3,6 +3,13 @@
 
 ![](https://img.shields.io/github/license/Sidelobe/Sonarcloud-CppFalsePositives)
 
+# Sonar Scanner Issues
+Take a look at these [Issues on Main branch](https://sonarcloud.io/project/issues?issueStatuses=OPEN%2CCONFIRMED&id=Sidelobe_Sonarcloud-CppFalsePositives). They are all reported for `example1.h`, which is clearly a C file! They only show up because that header file is included in a C++ file (compilation unit).
+
+### *--> Why are these issues not filtered out?*
+
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=Sidelobe_Sonarcloud-CppFalsePositives)](https://sonarcloud.io/summary/new_code?id=Sidelobe_Sonarcloud-CppFalsePositives)
+
 ## Examples of C++ Rules that are erroneously applied to C Code
 
 - _The global namespace should only contain "main", namespace declarations, and "extern" C declarations cpp:S997_
