@@ -21,6 +21,7 @@ jobs:
         run: |
           mkdir -p deploy
           mkdir -p deploy/build
+          mkdir -p ${{ env.BUILD_WRAPPER_OUT_DIR }}
           cd deploy/build
           cmake ../..
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make
