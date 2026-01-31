@@ -2,6 +2,7 @@
  * https://github.com/Sidelobe/Sonarcloud-CppFalsePositives */
 
 #include "exampleTests.hpp"
+#include <iostream>
 
 extern "C" {
 #include "example1.h"
@@ -9,16 +10,17 @@ extern "C" {
 
 bool runTests()
 {
-    if (exampleFunction1() > N) {
+    if (exampleFunction1() > 2) {
         return true;
     }
-    if (exampleFunction2(NULL) == false) {
+    if (exampleFunction2(nullptr) == false) {
         return true;
     }
-    if (MyCStyleEnum_COUNT == 2) {
+    if (MyCStyleEnum_COUNT + exampleFunction1() > 2) {
         return true;
     }
         
+    std::cout << "All tests passed." << std::endl;
     
     return false;
 }
