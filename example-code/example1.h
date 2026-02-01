@@ -36,4 +36,16 @@ static inline MyBoolType exampleFunction2(void* ptr)
     return true;
 }
 
+static inline float exampleFunction3(int i)
+{
+    return (float)(i) / 3.0f; // "C-style and functional notation casts should not be used cpp:S871"
+}
+
+static inline void exampleFunction4_clearly_longer_than_the_31chars_allowed(void)
+{
+    // Identifiers should not be longer than 31 characters cpp:S799
+    
+    // NOTE: Rule c:S799 is still applicable!
+}
+
 #endif // EXAMPLE1_H
