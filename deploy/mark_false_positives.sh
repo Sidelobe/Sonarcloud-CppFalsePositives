@@ -15,24 +15,24 @@ echo "Starting SonarQube C++ FALSE_POSITIVE cleanup for $PROJECT_KEY"
 ### ------------ HANDLE INPUT PARAMETERS -------------
 ALL=false
 PR_NUMBER=""
+DRY_RUN=false
 SEEN_OPTION=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --all)
             if $SEEN_OPTION; then
-                echo "Error: --all cannot be combined with other options"
+                echo "Error: --all cannot be combined with other primary options"
                 exit 1
             fi
             ALL=true
             SEEN_OPTION=true
-            echo "-- Scope set to ALL issues! --"
             shift
             ;;
 
         --pr)
             if $SEEN_OPTION; then
-                echo "Error: --pr cannot be combined with other options"
+                echo "Error: --pr cannot be combined with other primary options"
                 exit 1
             fi
 
@@ -48,8 +48,12 @@ while [[ $# -gt 0 ]]; do
 
             PR_NUMBER="$2"
             SEEN_OPTION=true
-            echo "-- Scope set only to issues added in PR #$PR_NUMBER --"
             shift 2
+            ;;
+
+        --dry-run)
+            DRY_RUN=true
+            shift
             ;;
 
         *)
@@ -59,14 +63,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Enforce that exactly one option was provided
+# Enforce exactly one primary option
 if ! $SEEN_OPTION; then
     echo "Error: you must specify either --all or --pr <number>"
     exit 1
 fi
-
-echo "ALL = $ALL"
-echo "PR_NUMBER = $PR_NUMBER"
 
 ### ------------ GO THROUGH ISSUES AND SET TO FALSE_POSITIVE -------------
 while :; do
@@ -91,11 +92,13 @@ while :; do
     if [[ "$rule" =~ ^(cpp|cxx): ]] && [[ "$path" =~ \.h$ ]]; then
       echo "→ C++ rule being applied to C code: $key ($rule) $path"
   
-      curl -s -u "$SONAR_TOKEN:" --request POST \
-        "$SONAR_HOST/api/issues/do_transition" \
-        -d "issue=$key" \
-        -d "transition=falsepositive" \
-        >/dev/null
+      if !$DRY_RUN; then
+        curl -s -u "$SONAR_TOKEN:" --request POST \
+          "$SONAR_HOST/api/issues/do_transition" \
+          -d "issue=$key" \
+          -d "transition=falsepositive" \
+          >/dev/null
+      fi
   
       total_marked=$((total_marked + 1))
     fi
@@ -104,4 +107,8 @@ while :; do
   page=$((page + 1))
 done
 
-echo "Done. Marked $total_marked issues as FALSE_POSITIVE."
+if $DRY_RUN; then
+  echo "Done. (DRY RUN) Marked $total_marked issues as FALSE_POSITIVE (DRY RUN)."
+else
+  echo "Done. Marked $total_marked issues as FALSE_POSITIVE."
+fi
