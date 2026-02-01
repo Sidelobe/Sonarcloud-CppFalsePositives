@@ -98,7 +98,7 @@ while :; do
     if [[ "$rule" =~ ^(cpp|cxx): ]] && [[ "$path" =~ \.h$ ]]; then
       echo "→ C++ rule being applied to C code: $key ($rule) $path"
   
-      if !$DRY_RUN; then
+      if ! $DRY_RUN; then
         curl -s -u "$SONAR_TOKEN:" --request POST \
           "$SONAR_HOST/api/issues/do_transition" \
           -d "issue=$key" \
