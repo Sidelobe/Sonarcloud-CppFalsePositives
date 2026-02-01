@@ -69,6 +69,12 @@ if ! $SEEN_OPTION; then
     exit 1
 fi
 
+if $ALL; then
+    echo "Scanning ALL issues"
+else
+    echo "Scanning issues raised in PR [$PR_NUMBER]"
+fi
+
 ### ------------ GO THROUGH ISSUES AND SET TO FALSE_POSITIVE -------------
 while :; do
   if $ALL; then
