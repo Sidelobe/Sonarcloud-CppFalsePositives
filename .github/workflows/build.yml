@@ -30,3 +30,16 @@ jobs:
         with:
           args: >
             --define "sonar.cfamily.compile-commands=${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json"
+      
+      - name: Clean false positives (C++ rules on C files)
+        shell: bash
+        working-directory: deploy
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            ./mark_false_positives.sh --pr "${{ github.event.pull_request.number }}"
+          else
+            # DISABLED FOR NOW ./mark_false_positives.sh --all
+          fi
+      
