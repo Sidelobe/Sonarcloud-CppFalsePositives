@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# A bash script to disable all Sonarqube issues that were created due to C++ rules
+# but were raised in C (header) files. The issues are set to 'falsepositive'
+# This is applied either to '-all', or only to the issues that were raised in '-pr <number>'
+# -> https://github.com/Sidelobe/Sonarcloud-CppFalsePositives
+
 set -euo pipefail
 
 
