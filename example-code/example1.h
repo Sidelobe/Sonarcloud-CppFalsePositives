@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <assert.h>
 
 #define N 10
 #define MYMACRO(x) ((x) + 1)
@@ -17,6 +18,11 @@ typedef enum MyCStyleEnum {
     MyCStyleEnum_Option2,
     MyCStyleEnum_COUNT
 } MyCStyleEnum;
+
+typedef MyStruct {
+    float a;
+    int b;
+} MyStruct;
 
 static inline int exampleFunction1(void)
 {
@@ -30,9 +36,13 @@ static inline int exampleFunction1(void)
 
 static inline MyBoolType exampleFunction2(void* ptr)
 {
-    if (ptr == NULL) {
-        return false;
+    assert(ptr != NULL);
+    
+    MyStruct* e = (MyStruct*) ptr;
+    if (ptr->b != 9) {
+      return false;
     }
+    
     return true;
 }
 
