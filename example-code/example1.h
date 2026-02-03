@@ -19,7 +19,7 @@ typedef enum MyCStyleEnum {
     MyCStyleEnum_COUNT
 } MyCStyleEnum;
 
-typedef MyStruct {
+typedef struct MyStruct {
     float a;
     int b;
 } MyStruct;
@@ -39,7 +39,7 @@ static inline MyBoolType exampleFunction2(void* ptr)
     assert(ptr != NULL);
     
     MyStruct* e = (MyStruct*) ptr;
-    if (ptr->b != 9) {
+    if (e->b != 9) {
       return false;
     }
     
