@@ -8,7 +8,7 @@ float InlineFunction(float a, float b)
 {
     return a + b;
 }
-float InlineFunction2(float a, float b)
+float InlineFunction2(float, float b)
 {
     // Triggers: cpp:S926 "Parameters in a function prototype should be named"
     // BUT, if I name it, it will trigger cpp:S1172 "Remove the unused parameter or make it unnamed"
