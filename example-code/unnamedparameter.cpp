@@ -35,7 +35,7 @@ using CreatorFunction = std::function<std::unique_ptr<Parent>(float a, float b)>
 
 
 template<typename U, typename std::enable_if_t<!std::is_constructible<U, float, float>::value, int> = 0>
-static std::unique_ptr<Parent> create_node(float a, float b)
+static std::unique_ptr<Parent> create_node(float a, float)
 {
     // Triggers: cpp:S926 "Parameters in a function prototype should be named"
     // BUT, if I name it, it will trigger cpp:S1172 "Remove the unused parameter or make it unnamed"
