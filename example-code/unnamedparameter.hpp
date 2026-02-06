@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
+
 class Parent
 {
 public:
