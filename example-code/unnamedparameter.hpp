@@ -10,13 +10,14 @@
 class Parent
 {
 public:
-    Parent(float a) {}
+    Parent(float a) : m_a(a) {}
+    float m_a;
 };
 
 class Child : public Parent
 {
 public:
-    Child(float a, float b) : Parent(a) {}
+    Child(float a, float) : Parent(a) {}
 };
 
 
