@@ -76,19 +76,28 @@ if ! $SEEN_OPTION; then
 fi
 
 ### ------------ GO THROUGH ISSUES AND SET TO FALSE_POSITIVE -------------
-while :; do
-  if $ALL; then
-    response=$(curl -s --request GET --header "Authorization: Bearer $SONAR_TOKEN" \
-      --url "$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&statuses=OPEN,CONFIRMED,REOPENED&ps=$PAGE_SIZE&p=$page")
-  else
-    response=$(curl -s --request GET --header "Authorization: Bearer $SONAR_TOKEN" \
-      --url "$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&pullRequest=$PR_NUMBER&inNewCodePeriod=true&ps=$PAGE_SIZE&p=$page")
+while :; do # iterate over pages
+  
+  url="$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&statuses=OPEN,CONFIRMED,REOPENED,RESOLVED&ps=$PAGE_SIZE&p=$page"
+  if ! $ALL; then
+      url="${url}&pullRequest=$PR_NUMBER&inNewCodePeriod=true"
   fi
+  
+  response=$(curl -s --request GET --header "Authorization: Bearer $SONAR_TOKEN" --url "$url")
+  if [ -z "${response}" ]; then
+      echo "Got no response ... check that SONAR_TOKEN is set correctly"
+      exit 1
+  elif jq -e '.errors | length>0' >/dev/null 2>&1 <<<  "$response"; then
+      echo "SonarQube API error!" >&2
+      jq -r '.errors[].msg' <<< "$response" >&2
+      exit 1
+  fi
+  
   issue_count=$(jq '.issues | length' <<< "$response")
   
   [ "$issue_count" -eq 0 ] && break
   
-  echo "$issue_count Issues are OPEN"
+  echo "Found a total of $issue_count {OPEN, CONFIRMED, REOPENED, RESOLVED} issues on page $page"
 
   while IFS= read -r issue; do
     key=$(jq -r '.key' <<< "$issue")
@@ -111,7 +120,7 @@ while :; do
   done < <(jq -c '.issues[]' <<< "$response")
 
   page=$((page + 1))
-done
+done # end iterate over pages
 
 if $DRY_RUN; then
   echo "Done. (DRY RUN) Marked $total_marked issues as FALSE_POSITIVE (DRY RUN)."
