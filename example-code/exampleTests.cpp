@@ -16,7 +16,7 @@ bool runTests()
     if (exampleFunction2(nullptr) == false) {
         return true;
     }
-    if (MyCStyleEnum_COUNT + exampleFunction1() > 2) {
+    if (MyCStyleEnum_COUNT + static_cast<int>(exampleFunction3(5)) > 2) {
         return true;
     }
         
