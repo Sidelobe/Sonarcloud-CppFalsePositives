@@ -75,6 +75,12 @@ if ! $SEEN_OPTION; then
     exit 1
 fi
 
+if $ALL; then
+    echo "Scanning ALL issues"
+else
+    echo "Scanning issues raised in PR [$PR_NUMBER]"
+fi
+
 ### ------------ GO THROUGH ISSUES AND SET TO FALSE_POSITIVE -------------
 while :; do # iterate over pages
   
@@ -107,7 +113,7 @@ while :; do # iterate over pages
     if [[ "$rule" =~ ^(cpp|cxx): ]] && [[ "$path" =~ \.h$ ]]; then
       echo "→ C++ rule being applied to C code: $key ($rule) $path"
   
-      if !$DRY_RUN; then
+      if ! $DRY_RUN; then
         curl -s -u "$SONAR_TOKEN:" --request POST \
           "$SONAR_HOST/api/issues/do_transition" \
           -d "issue=$key" \
