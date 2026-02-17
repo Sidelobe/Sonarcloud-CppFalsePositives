@@ -75,10 +75,16 @@ if ! $SEEN_OPTION; then
     exit 1
 fi
 
+if $ALL; then
+    echo "Scanning ALL issues"
+else
+    echo "Scanning issues raised in PR [$PR_NUMBER]"
+fi
+
 ### ------------ GO THROUGH ISSUES AND SET TO FALSE_POSITIVE -------------
 while :; do # iterate over pages
   
-  url="$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&statuses=OPEN,CONFIRMED,REOPENED,RESOLVED&ps=$PAGE_SIZE&p=$page"
+  url="$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&issueStatuses=OPEN,CONFIRMED,ACCEPTED&ps=$PAGE_SIZE&p=$page"
   if ! $ALL; then
       url="${url}&pullRequest=$PR_NUMBER&inNewCodePeriod=true"
   fi
@@ -97,17 +103,17 @@ while :; do # iterate over pages
   
   [ "$issue_count" -eq 0 ] && break
   
-  echo "Found a total of $issue_count {OPEN, CONFIRMED, REOPENED, RESOLVED} issues on page $page"
+  echo "Found a total of $issue_count {OPEN, CONFIRMED, ACCEPTED} issues on page $page"
 
   while IFS= read -r issue; do
     key=$(jq -r '.key' <<< "$issue")
     rule=$(jq -r '.rule' <<< "$issue")
     path=$(jq -r '.component' <<< "$issue")
-  
+    
     if [[ "$rule" =~ ^(cpp|cxx): ]] && [[ "$path" =~ \.h$ ]]; then
       echo "→ C++ rule being applied to C code: $key ($rule) $path"
-  
-      if !$DRY_RUN; then
+
+      if [ $DRY_RUN = false ]; then
         curl -s -u "$SONAR_TOKEN:" --request POST \
           "$SONAR_HOST/api/issues/do_transition" \
           -d "issue=$key" \
@@ -122,7 +128,7 @@ while :; do # iterate over pages
   page=$((page + 1))
 done # end iterate over pages
 
-if $DRY_RUN; then
+if [ $DRY_RUN = true ]; then
   echo "Done. (DRY RUN) Marked $total_marked issues as FALSE_POSITIVE (DRY RUN)."
 else
   echo "Done. Marked $total_marked issues as FALSE_POSITIVE."
